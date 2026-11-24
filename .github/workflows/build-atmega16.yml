@@ -25,8 +25,9 @@ jobs:
         run: |
           avr-gcc -mmcu=atmega16 -DF_CPU=8000000UL -Os -std=gnu11 -Wall -Wextra \
             -o papan_skor.elf main_papan_skor_atmega16.c
+
           avr-objcopy -O ihex -R .eeprom papan_skor.elf papan_skor.hex
-          avr-size -C --mcu=atmega16 papan_skor.elf
+
           test -s papan_skor.hex
 
       - name: Simpan file HEX
