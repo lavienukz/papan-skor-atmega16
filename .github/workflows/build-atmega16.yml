@@ -1,0 +1,37 @@
+
+name: Build HEX ATmega16
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'main_papan_skor_atmega16.c'
+      - '.github/workflows/build-atmega16.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil source code
+        uses: actions/checkout@v4
+
+      - name: Pasang AVR-GCC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-avr avr-libc binutils-avr
+
+      - name: Kompilasi ATmega16
+        run: |
+          avr-gcc -mmcu=atmega16 -DF_CPU=8000000UL -Os -std=gnu11 -Wall -Wextra \
+            -o papan_skor.elf main_papan_skor_atmega16.c
+          avr-objcopy -O ihex -R .eeprom papan_skor.elf papan_skor.hex
+          avr-size -C --mcu=atmega16 papan_skor.elf
+          test -s papan_skor.hex
+
+      - name: Simpan file HEX
+        uses: actions/upload-artifact@v4
+        with:
+          name: papan-skor-atmega16-hex
+          path: papan_skor.hex
+          retention-days: 7
